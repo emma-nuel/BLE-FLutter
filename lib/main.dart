@@ -4,21 +4,25 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 const SERVICE_UUID      =  "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-String? recievedData;
+List recievedData = [];
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -36,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startScan() {
-    flutterBlue.startScan(timeout: Duration(seconds: 10));
+    flutterBlue.startScan(timeout: const Duration(seconds: 10));
     flutterBlue.scanResults.listen((results) {
       for (ScanResult result in results) {
         if (result.device.name == 'ESP32Ble') {
@@ -59,7 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
             characteristic.setNotifyValue(true);
             characteristic.value.listen((value) {
               // Handle received data here
+              // print("Value: $value");
+             
               print('Received data: ${String.fromCharCodes(value)}');
+              setState(() {
+                recievedData = String.fromCharCodes(value).split(',');
+              });            
             });
           }
         }
@@ -71,10 +80,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BLE Receiver'),
+        title: const Text('BLE Receiver'),
       ),
       body: Center(
-        child: Text('Receiving data...'),
+        child: Column(
+          children: [
+            const Text('Receiving data...'),
+            Text("Recieved Data: ${recievedData}")
+          ],
+        ),
+
       ),
     );
   }
